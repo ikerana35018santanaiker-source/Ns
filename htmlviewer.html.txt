@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>INHABIT Menu</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+
+    body {
+      background: linear-gradient(135deg, #1e1e2f, #2b2b47);
+      height: 100vh; display: flex; justify-content: center; align-items: center;
+      overflow: hidden; color: white;
+    }
+
+    /* Pantalla de carga */
+    #loadingScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: #111; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .loadingBar { width: 300px; height: 25px; background: #333; border-radius: 20px; overflow: hidden; margin-top: 20px; }
+    .loadingFill { height: 100%; width: 0%; background: linear-gradient(90deg, #00f0ff, #00ff80, #ff00ff); animation: loadingAnim 3s linear forwards; }
+    @keyframes loadingAnim { from { width: 0%; } to { width: 100%; } }
+
+    /* Menú principal */
+    #mainMenu { display: none; flex-direction: column; gap: 20px; text-align: center;
+      backdrop-filter: blur(15px); background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px; padding: 40px; box-shadow: 0 0 20px rgba(0, 255, 255, 0.4); animation: fadeIn 1s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    .option { background: rgba(0, 0, 0, 0.6); border: 2px solid #00f0ff; border-radius: 15px; padding: 20px; width: 300px; cursor: pointer;
+      transition: 0.3s; box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff inset; }
+    .option:hover { transform: scale(1.08); box-shadow: 0 0 20px #00f0ff, 0 0 30px #00f0ff inset; }
+    .option img { width: 100px; margin-bottom: 10px; }
+
+    /* Dashboard */
+    #dashboard { display: none; flex-direction: column; align-items: center; justify-content: space-between;
+      width: 100%; height: 100%; padding-bottom: 80px; }
+    #dashboard h1 { margin-top: 40px; font-size: 32px; background: linear-gradient(90deg, #00f0ff, #ff00ff, #00ff80);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .typing { border-right: 3px solid #00f0ff; white-space: nowrap; overflow: hidden; width: 0;
+      animation: typing 3s steps(30, end) forwards, blink 0.7s infinite; }
+    @keyframes typing { from { width: 0; } to { width: 100%; } }
+    @keyframes blink { 50% { border-color: transparent; } }
+
+    /* Bottombar */
+    .bottombar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+      background: rgba(20, 20, 40, 0.8); backdrop-filter: blur(10px);
+      display: flex; justify-content: space-between; align-items: center; padding: 0 40px; border-top: 2px solid #00f0ff; }
+    .bottombar button { background: none; border: none; cursor: pointer; }
+    .bottombar img { width: 40px; height: 40px; border-radius: 50%; transition: 0.2s; }
+    .bottombar img:hover { transform: scale(1.1); }
+    #userIcon { border: 2px solid #00f0ff; }
+
+    /* Overlay buscador */
+    #searchOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);
+      display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    #searchOverlay.active { opacity: 1; pointer-events: all; }
+    #searchBox { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #00f0ff;
+      display: flex; flex-direction: column; gap: 15px; width: 300px; transform: translateY(-50px); transition: transform 0.3s ease; }
+    #searchOverlay.active #searchBox { transform: translateY(0); }
+    #searchBox input { padding: 10px; border: none; border-radius: 10px; outline: none; font-size: 16px; }
+    #closeSearch { background: #ff0055; border: none; border-radius: 10px; color: white; padding: 10px; cursor: pointer; }
+
+    /* Popup juegos */
+    #gamePopup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(30,30,50,0.95); padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #00f0ff;
+      display: none; flex-direction: column; align-items: center; gap: 10px; z-index: 2000; min-width: 260px; }
+    #gamePopup img { width: 200px; border-radius: 10px; }
+    #gamePopup button { margin-top: 10px; padding: 10px 20px; background: #00f0ff; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+    #closePopup { position: absolute; top: 10px; right: 10px; background: #ff0055; border: none; color: white; font-size: 18px;
+      font-weight: bold; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; line-height: 28px; }
+
+    /* Botones IA y Más */
+    .sideButtons { position: fixed; bottom: 90px; right: 20px; display: none; flex-direction: column; gap: 10px; }
+    .sideButtons button { background: #00f0ff; border: none; border-radius: 8px; padding: 8px 15px; cursor: pointer;
+      font-weight: bold; color: #111; box-shadow: 0 0 10px #00f0ff; transition: transform 0.2s; }
+    .sideButtons button:hover { transform: scale(1.05); }
+
+    #masPanel { position: fixed; right: 20px; bottom: 160px; background: rgba(30,30,50,0.95);
+      padding: 20px; border-radius: 12px; box-shadow: 0 0 20px #00f0ff; display: none;
+      flex-direction: column; align-items: center; gap: 10px; z-index: 2000; max-width: 400px; }
+    #masPanel p { text-align: center; }
+    #masPanel button { background: #ff00aa; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer;
+      color: white; font-weight: bold; box-shadow: 0 0 10px #ff00aa; }
+    #closeMas { background: #ff0055; border: none; border-radius: 6px; color: white; padding: 5px 10px; cursor: pointer; align-self: flex-end; }
+
+    .pcUI { font-size: 22px; color: #00f0ff; }
+    .mobileUI { font-size: 18px; color: #ff80ff; }
+  </style>
+</head>
+<body>
+  <!-- Pantalla de carga -->
+  <div id="loadingScreen">
+    <h1>Cargando...</h1>
+    <div class="loadingBar"><div class="loadingFill"></div></div>
+  </div>
+
+  <!-- Menú principal -->
+  <div id="mainMenu">
+    <div class="option" onclick="setUI('pc')">
+      <img src="https://tr.rbxcdn.com/180DAY-fe233c3057a85b2eac993564531b21d8/420/420/ShoulderAccessory/Webp/noFilter" alt="PC">
+      <p>Soy de PC 💻</p>
+    </div>
+    <div class="option" onclick="setUI('mobile')">
+      <img src="https://i.pinimg.com/736x/5e/a8/4b/5ea84bc9e34875e10c5dadff8c61312c.jpg" alt="Móvil">
+      <p>Estoy en Móvil 📱</p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard">
+    <h1 class="typing">Bienvenido al Dashboard 👾</h1>
+    <div class="bottombar">
+      <div></div>
+      <button id="searchBtn"><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Buscar"></button>
+      <button>
+        <img id="userIcon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Usuario">
+        <input type="file" id="uploadIcon" accept="image/*" style="display:none">
+      </button>
+    </div>
+    <!-- Botones IA y Más -->
+    <div class="sideButtons" id="sideButtons">
+      <button id="iaBtn">IA</button>
+      <button id="masBtn">Más</button>
+    </div>
+  </div>
+
+  <!-- Panel Más -->
+  <div id="masPanel">
+    <button id="closeMas">✖</button>
+    <p><strong>¿Eres un Roblox Developer?</strong></p>
+    <p>¡Dale al siguiente botón para hablar o pedir ayuda a Iker Belancor!</p>
+    <button id="joinBtn">¡ÚNETE!</button>
+  </div>
+
+  <!-- Overlay de búsqueda -->
+  <div id="searchOverlay">
+    <div id="searchBox">
+      <input type="text" placeholder="Buscar..." id="searchInput">
+      <button id="closeSearch">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Popup juegos -->
+  <div id="gamePopup">
+    <button id="closePopup">✖</button>
+    <img id="gameThumbnail" src="" alt="Juego">
+    <h3 id="gameTitle"></h3>
+    <button id="gameLink">Jugar</button>
+  </div>
+
+  <script>
+    // Simula la carga
+    setTimeout(() => {
+      document.getElementById("loadingScreen").style.display = "none";
+      document.getElementById("mainMenu").style.display = "flex";
+    }, 3000);
+
+    function setUI(type) {
+      document.getElementById("mainMenu").style.display = "none";
+      document.getElementById("dashboard").style.display = "flex";
+      document.getElementById("sideButtons").style.display = "flex";
+      document.body.className = type === "pc" ? "pcUI" : "mobileUI";
+    }
+
+    // Manejo del icono de usuario
+    const userIcon = document.getElementById("userIcon");
+    const uploadIcon = document.getElementById("uploadIcon");
+    const savedIcon = localStorage.getItem("userIcon");
+    if (savedIcon) userIcon.src = savedIcon;
+    userIcon.addEventListener("click", () => uploadIcon.click());
+    uploadIcon.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          userIcon.src = e.target.result;
+          localStorage.setItem("userIcon", e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Overlay búsqueda
+    const searchOverlay = document.getElementById("searchOverlay");
+    document.getElementById("searchBtn").addEventListener("click", () => {
+      searchOverlay.classList.add("active");
+      document.getElementById("searchInput").focus();
+    });
+    document.getElementById("closeSearch").addEventListener("click", () => {
+      searchOverlay.classList.remove("active");
+    });
+
+    // Popup juegos
+    const gamePopup = document.getElementById("gamePopup");
+    const gameThumbnail = document.getElementById("gameThumbnail");
+    const gameTitle = document.getElementById("gameTitle");
+    const gameLink = document.getElementById("gameLink");
+    document.getElementById("closePopup").addEventListener("click", () => gamePopup.style.display = "none");
+
+    const juegos = {
+      "Ink Game": { thumbnail: "https://tr.rbxcdn.com/180DAY-eeb754830041c5f9ddfd168242949f14/768/432/Image/Webp/noFilter", link: "https://www.roblox.com/games/1234567890/Ink-Game" },
+      "Grow a Garden": { thumbnail: "https://c.files.bbci.co.uk/5ea8/live/3fab4f60-4d1c-11f0-8c47-237c2e4015f5.jpg", link: "https://www.roblox.com/games/1234567891/Grow-a-Garden" },
+      "Steal a Brainrot": { thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTri7DGuNalX-dtCy7amlQunWYEXm3zdnL8orNE5yu17w&s", link: "https://www.roblox.com/games/1234567892/Steal-a-Brainrot" }
+    };
+
+    document.getElementById("searchInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const query = e.target.value.trim();
+        if (juegos[query]) {
+          const juego = juegos[query];
+          gameThumbnail.src = juego.thumbnail;
+          gameTitle.textContent = query;
+          gameLink.onclick = () => window.open(juego.link, "_blank");
+          gamePopup.style.display = "flex";
+        } else {
+          alert("No se encontró el juego. Usa un nombre exacto.");
+        }
+      }
+    });
+
+    // Botón IA abre enlace
+    document.getElementById("iaBtn").addEventListener("click", () => {
+      window.open("https://www.roblox.com/es/games/11987675791/Chat-with-AI", "_blank");
+    });
+
+    // Panel Más
+    const masBtn = document.getElementById("masBtn");
+    const masPanel = document.getElementById("masPanel");
+    document.getElementById("closeMas").addEventListener("click", () => masPanel.style.display = "none");
+    masBtn.addEventListener("click", () => masPanel.style.display = "flex");
+
+    // Botón ÚNETE abre perfil Discord
+    document.getElementById("joinBtn").addEventListener("click", () => {
+      window.open("https://discord.com/users/1166067053057282178", "_blank");
+    });
+  </script>
+</body>
+</html>
