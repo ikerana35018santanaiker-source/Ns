@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú Cool Roblox</title>
+  <style>
+    body, html { margin:0; padding:0; height:100%; overflow:hidden; font-family: Arial,sans-serif; background:black; color:white;}
+    #particles { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:black;}
+
+    /* Pantalla de carga */
+    #loadingScreen {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      display:flex; justify-content:center; align-items:center;
+      background: radial-gradient(circle,#0ff 0%,#000 100%);
+      flex-direction: column; color:white; font-size:24px; z-index:10;
+    }
+    .loadingBar { width:300px; height:25px; background:#333; border-radius:20px; overflow:hidden; margin-top:20px;}
+    .loadingFill { height:100%; width:0%; background: linear-gradient(90deg,#00f0ff,#00ff80,#ff00ff); animation: loadAnim 3s linear forwards;}
+    @keyframes loadAnim { from{width:0%;} to{width:100%;} }
+
+    .dashboard { position: relative; padding: 20px; text-align: center; z-index:1; }
+    .game-card { display:inline-block; margin:10px; width:200px; border-radius:12px; overflow:hidden; background: rgba(255,255,255,0.05); box-shadow:0 4px 10px rgba(0,0,0,0.5); transition: transform 0.3s ease; cursor:pointer; }
+    .game-card:hover { transform: scale(1.05); }
+    .game-card img { width:100%; display:block; }
+    .game-card button { margin:5px; padding:5px 8px; border:none; border-radius:6px; background:red; color:white; cursor:pointer; }
+
+    /* Botones flotantes */
+    .menu-buttons { position: fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:5;}
+    .menu-buttons button { padding:10px 15px; border:none; border-radius:8px; background:#0ff; color:black; font-weight:bold; cursor:pointer; transition: transform 0.2s;}
+    .menu-buttons button:hover { transform: scale(1.1); }
+
+    /* Panel Más */
+    .panel { position: fixed; bottom:-100%; left:0; width:100%; background: rgba(0,0,0,0.9); color:white; text-align:center; padding:20px; border-radius:20px 20px 0 0; transition: bottom 0.5s ease; z-index:4;}
+    .panel.open { bottom:0; }
+
+    /* Noticias */
+    .news-bell { position:fixed; top:20px; right:70px; font-size:28px; cursor:pointer; z-index:5; }
+    .settings-btn { position:fixed; top:20px; right:20px; width:32px; height:32px; cursor:pointer; z-index:5;}
+    .news-popup { position:fixed; top:70px; right:20px; width:300px; background:rgba(0,0,0,0.95); border:1px solid #0ff; border-radius:12px; padding:15px; display:none; z-index:6;}
+    .news-item { margin-bottom:12px; border-bottom:1px solid #0ff; padding-bottom:8px; }
+    .news-item:last-child { border-bottom:none; }
+    .bubble { display:inline-block; background:#0ff; color:black; padding:2px 6px; border-radius:12px; font-size:12px; margin-left:6px; }
+
+    /* Panel notas */
+    #notesPanel { position: fixed; right:20px; top:150px; width:300px; max-height:70%; overflow-y:auto; background: rgba(0,0,0,0.95); border:1px solid #0ff; border-radius:12px; padding:10px; display:none; z-index:6;}
+    #notesPanel h3 { margin-top:0;}
+    #notesPanel textarea { width:100%; height:60px; margin-top:5px; border-radius:8px; padding:5px;}
+    #notesPanel button { margin-top:5px; padding:5px 10px; background:#0ff; border:none; border-radius:6px; color:black; font-weight:bold; cursor:pointer;}
+    .note-item { background:rgba(0,255,255,0.1); margin:5px 0; padding:5px; border-radius:6px; font-size:14px;}
+
+    /* Panel ajustes */
+    #settingsPanel { position:fixed; top:60px; right:20px; width:200px; background:rgba(0,0,0,0.95); border:1px solid #0ff; border-radius:12px; padding:15px; display:none; z-index:7;}
+    #settingsPanel label { display:block; margin:5px 0; }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <!-- Pantalla de carga -->
+  <div id="loadingScreen">
+    <div id="loadingText">Cargando...</div>
+    <div class="loadingBar"><div class="loadingFill"></div></div>
+  </div>
+
+  <div class="dashboard" id="dashboard">
+    <h1 id="dashboardTitle">Bienvenido a tu Dashboard Roblox</h1>
+    <div id="gamesContainer"></div>
+  </div>
+
+  <!-- Botones menú -->
+  <div class="menu-buttons">
+    <button id="btnIA" onclick="openIA()">IA</button>
+    <button id="btnMore" onclick="togglePanel()">Más</button>
+    <button id="btnAdd" onclick="addGamePrompt()">Añadir Juego</button>
+    <button id="btnWeb" onclick="openWeb()">The 6 Web</button>
+  </div>
+
+  <!-- Panel Más -->
+  <div class="panel" id="panel">
+    <h2 id="panelTitle">¿Eres un Roblox Developer?</h2>
+    <p id="panelText">¡Dale al siguiente botón para hablar o pedir ayuda a Iker Belancor!</p>
+    <button id="panelButton" onclick="openDiscord()">¡ÚNETE!</button>
+  </div>
+
+  <!-- Noticias -->
+  <div class="news-bell" onclick="toggleNews()">🔔</div>
+  <img class="settings-btn" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBZ_vU1-wdBg1rx4DHO3PiOjYmsrlK98vfWYY1OXWBvKdbGHXn95ui6s8&s=10" onclick="toggleSettings()" alt="Ajustes">
+  <div class="news-popup" id="newsPopup"><div id="newsList"></div></div>
+
+  <!-- Panel notas -->
+  <div id="notesPanel">
+    <h3 id="noteTitle"></h3>
+    <div id="notesList"></div>
+    <textarea id="noteInput" placeholder="Escribe tu nota aquí..."></textarea>
+    <button onclick="saveNote()">Guardar Nota</button>
+  </div>
+
+  <!-- Panel ajustes -->
+  <div id="settingsPanel">
+    <label for="langSelect">Idioma:</label>
+    <select id="langSelect">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+    </select>
+  </div>
+
+  <script>
+    // Traducciones
+    const texts = {
+      en: { loading:"Loading...", dashboard:"Welcome to your Roblox Dashboard", btnIA:"AI", btnMore:"More", btnAdd:"Add Game", btnWeb:"The 6 Web", panelTitle:"Are you a Roblox Developer?", panelText:"Click the button below to chat with Iker Belancor!", panelButton:"JOIN", notePlaceholder:"Write your note here...", newsDays:"days ago" },
+      es: { loading:"Cargando...", dashboard:"Bienvenido a tu Dashboard Roblox", btnIA:"IA", btnMore:"Más", btnAdd:"Añadir Juego", btnWeb:"The 6 Web", panelTitle:"¿Eres un Roblox Developer?", panelText:"¡Dale al siguiente botón para hablar o pedir ayuda a Iker Belancor!", panelButton:"¡ÚNETE!", notePlaceholder:"Escribe tu nota aquí...", newsDays:"días" },
+      fr: { loading:"Chargement...", dashboard:"Bienvenue sur votre Dashboard Roblox", btnIA:"IA", btnMore:"Plus", btnAdd:"Ajouter un jeu", btnWeb:"The 6 Web", panelTitle:"Êtes-vous un développeur Roblox?", panelText:"Cliquez sur le bouton ci-dessous pour parler à Iker Belancor!", panelButton:"REJOINDRE", notePlaceholder:"Écrivez votre note ici...", newsDays:"jours" }
+    };
+
+    // Idioma
+    const langSelect = document.getElementById("langSelect");
+    let lang = localStorage.getItem("lang") || "en";
+    langSelect.value = lang;
+
+    function applyLanguage() {
+      const t = texts[lang];
+      document.getElementById("loadingText").innerText = t.loading;
+      document.getElementById("dashboardTitle").innerText = t.dashboard;
+      document.getElementById("btnIA").innerText = t.btnIA;
+      document.getElementById("btnMore").innerText = t.btnMore;
+      document.getElementById("btnAdd").innerText = t.btnAdd;
+      document.getElementById("btnWeb").innerText = t.btnWeb;
+      document.getElementById("panelTitle").innerText = t.panelTitle;
+      document.getElementById("panelText").innerText = t.panelText;
+      document.getElementById("panelButton").innerText = t.panelButton;
+      document.getElementById("noteInput").placeholder = t.notePlaceholder;
+      renderNews();
+    }
+
+    langSelect.addEventListener("change", ()=>{
+      lang = langSelect.value;
+      localStorage.setItem("lang", lang);
+      applyLanguage();
+    });
+
+    // Simula carga
+    setTimeout(()=>{ document.getElementById("loadingScreen").style.display="none"; loadGames(); applyLanguage();}, 3000);
+
+    // Partículas
+    const canvas=document.getElementById("particles"),ctx=canvas.getContext("2d");
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    const particles=[];
+    for(let i=0;i<60;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5});}
+    function drawParticles(){ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#0ff"; particles.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); p.x+=p.dx; p.y+=p.dy; if(p.x<0||p.x>canvas.width)p.dx*=-1; if(p.y<0||p.y>canvas.height)p.dy*=-1;}); requestAnimationFrame(drawParticles);}
+    drawParticles();
+
+    // Noticias
+    const news=[{title:"Nueva versión de INHABIT",text:"Se ha lanzado la versión 1.2 con nuevos mapas.",date:"2025-09-15"},{title:"Evento especial",text:"Próximo evento de Halloween en desarrollo.",date:"2025-05-18"}];
+    function daysAgo(date){return Math.floor((new Date()-new Date(date))/(1000*60*60*24));}
+    function toggleNews(){
+      const popup=document.getElementById("newsPopup");
+      popup.style.display=(popup.style.display==="block")?"none":"block";
+      if(popup.style.display==="block") renderNews();
+    }
+    function renderNews(){
+      const container=document.getElementById("newsList"); container.innerHTML="";
+      const t = texts[lang];
+      news.forEach(n=>{
+        const item=document.createElement("div"); item.className="news-item";
+        const days=daysAgo(n.date);
+        item.innerHTML=`<strong>${n.title}</strong> <span class="bubble">${t.newsDays.replace("days",days)}</span><br><small>${n.text}</small>`;
+        container.appendChild(item);
+      });
+    }
+
+    // Panel Más
+    function togglePanel(){document.getElementById("panel").classList.toggle("open");}
+    function openIA(){window.open("https://www.roblox.com/es/games/11987675791/Chat-with-AI","_blank");}
+    function openDiscord(){window.open("https://discord.com/users/1166067053057282178","_blank");}
+    function openWeb(){window.open("https://the6web.netlify.com","_blank");}
+
+    // Ajustes
+    function toggleSettings(){
+      const panel=document.getElementById("settingsPanel");
+      panel.style.display=(panel.style.display==="block")?"none":"block";
+    }
+
+    // Gestión juegos y notas
+    let currentGame=null;
+    function loadGames(){
+      const container=document.getElementById("gamesContainer");
+      container.innerHTML="";
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.forEach((g,i)=>{
+        const card=document.createElement("div"); card.className="game-card";
+        card.innerHTML=`<img src="${g.thumb||'https://via.placeholder.com/200x100'}"><p>${g.name}</p><button onclick="removeGame(${i})">Eliminar</button>`;
+        card.onclick=()=>openNotes(g.name);
+        container.appendChild(card);
+      });
+    }
+    function addGamePrompt(){
+      const name=prompt(texts[lang].btnAdd); if(!name)return;
+      const thumb=prompt("URL miniatura (opcional)");
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.push({name,thumb,notes:[]});
+      localStorage.setItem("games",JSON.stringify(games));
+      loadGames();
+    }
+    function removeGame(index){
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.splice(index,1);
+      localStorage.setItem("games",JSON.stringify(games));
+      loadGames();
+    }
+
+    function openNotes(name){
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      currentGame=games.find(g=>g.name===name);
+      document.getElementById("noteTitle").innerText=currentGame.name;
+      renderNotes();
+      document.getElementById("notesPanel").style.display="block";
+    }
+    function renderNotes(){
+      const container=document.getElementById("notesList"); container.innerHTML="";
+      currentGame.notes.forEach(n=>{
+        const div=document.createElement("div"); div.className="note-item"; div.innerText=`[${n.date}] ${n.text}`;
+        container.appendChild(div);
+      });
+    }
+    function saveNote(){
+      const text=document.getElementById("noteInput").value.trim();
+      if(!text)return alert("Escribe algo!");
+      const date=new Date().toLocaleDateString();
+      currentGame.notes.push({text,date});
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      const idx=games.findIndex(g=>g.name===currentGame.name);
+      games[idx]=currentGame;
+      localStorage.setItem("games",JSON.stringify(games));
+      document.getElementById("noteInput").value="";
+      renderNotes();
+    }
+  </script>
+</body>
+</html>
