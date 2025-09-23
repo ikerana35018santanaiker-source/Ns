@@ -3,38 +3,308 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iker's Web</title>
+  <title>Menú Cool Roblox</title>
   <style>
-    body, html { margin:0; padding:0; height:100%; overflow:hidden; font-family: Arial,sans-serif; background:black; color:white;}
-    #particles { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:black;}
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      overflow: hidden; font-family: Arial, sans-serif;
+      background: black; color: white;
+    }
+    #particles { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:black; }
 
     /* Pantalla de carga */
     #loadingScreen {
-      position:fixed; top:0; left:0; width:100%; height:100%;
+      position: fixed; top:0; left:0; width:100%; height:100%;
       display:flex; justify-content:center; align-items:center;
-      background: radial-gradient(circle,#0ff 0%,#000 100%);
-      flex-direction: column; color:white; font-size:24px; z-index:10;
+      background: radial-gradient(circle, #0ff 0%, #000 100%);
+      flex-direction: column; color:white; font-size:24px;
+      z-index:10;
     }
-    .loadingBar { width:300px; height:25px; background:#333; border-radius:20px; overflow:hidden; margin-top:20px;}
-    .loadingFill { height:100%; width:0%; background: linear-gradient(90deg,#00f0ff,#00ff80,#ff00ff); animation: loadAnim 3s linear forwards;}
-    @keyframes loadAnim { from{width:0%;} to{width:100%;} }
+    .loadingBar { width:300px; height:25px; background:#333; border-radius:20px; overflow:hidden; margin-top:20px; }
+    .loadingFill { height:100%; width:0%; background: linear-gradient(90deg, #00f0ff, #00ff80, #ff00ff); animation: loadAnim 3s linear forwards; }
+    @keyframes loadAnim { from { width:0%; } to { width:100%; } }
 
     .dashboard { position: relative; padding: 20px; text-align: center; z-index:1; }
-    .game-card { display:inline-block; margin:10px; width:200px; border-radius:12px; overflow:hidden; background: rgba(255,255,255,0.05); box-shadow:0 4px 10px rgba(0,0,0,0.5); transition: transform 0.3s ease; cursor:pointer; }
+    .game-card {
+      display:inline-block; margin:10px; width:200px; border-radius:12px; overflow:hidden;
+      background: rgba(255,255,255,0.05); box-shadow:0 4px 10px rgba(0,0,0,0.5); transition: transform 0.3s ease; cursor:pointer;
+    }
     .game-card:hover { transform: scale(1.05); }
     .game-card img { width:100%; display:block; }
     .game-card button { margin:5px; padding:5px 8px; border:none; border-radius:6px; background:red; color:white; cursor:pointer; }
 
     /* Botones flotantes */
-    .menu-buttons { position: fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:5;}
-    .menu-buttons button { padding:10px 15px; border:none; border-radius:8px; background:#0ff; color:black; font-weight:bold; cursor:pointer; transition: transform 0.2s;}
+    .menu-buttons {
+      position: fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:5;
+    }
+    .menu-buttons button {
+      padding:10px 15px; border:none; border-radius:8px; background:#0ff; color:black; font-weight:bold; cursor:pointer; transition: transform 0.2s;
+    }
     .menu-buttons button:hover { transform: scale(1.1); }
 
     /* Panel Más */
-    .panel { position: fixed; bottom:-100%; left:0; width:100%; background: rgba(0,0,0,0.9); color:white; text-align:center; padding:20px; border-radius:20px 20px 0 0; transition: bottom 0.5s ease; z-index:4;}
+    .panel {
+      position: fixed; bottom:-100%; left:0; width:100%;
+      background: rgba(0,0,0,0.9); color:white; text-align:center; padding:20px; border-radius:20px 20px 0 0;
+      transition: bottom 0.5s ease; z-index:4;
+    }
     .panel.open { bottom:0; }
 
     /* Noticias */
+    .news-bell { position:fixed; top:20px; right:60px; font-size:28px; cursor:pointer; z-index:5; }
+    .settings-gear { position:fixed; top:20px; right:20px; font-size:28px; cursor:pointer; z-index:5; }
+    .news-popup {
+      position:fixed; top:70px; right:20px; width:300px; background:rgba(0,0,0,0.95); border:1px solid #0ff;
+      border-radius:12px; padding:15px; display:none; z-index:6;
+    }
+    .news-item { margin-bottom:12px; border-bottom:1px solid #0ff; padding-bottom:8px; }
+    .news-item:last-child { border-bottom:none; }
+    .bubble { display:inline-block; background:#0ff; color:black; padding:2px 6px; border-radius:12px; font-size:12px; margin-left:6px; }
+
+    /* Panel notas */
+    #notesPanel {
+      position: fixed; right:20px; top:150px; width:300px; max-height:70%; overflow-y:auto;
+      background: rgba(0,0,0,0.95); border:1px solid #0ff; border-radius:12px; padding:10px; display:none; z-index:6;
+    }
+    #notesPanel h3 { margin-top:0; }
+    #notesPanel textarea { width:100%; height:60px; margin-top:5px; border-radius:8px; padding:5px; }
+    #notesPanel button { margin-top:5px; padding:5px 10px; background:#0ff; border:none; border-radius:6px; color:black; font-weight:bold; cursor:pointer; }
+    .note-item { background:rgba(0,255,255,0.1); margin:5px 0; padding:5px; border-radius:6px; font-size:14px; }
+
+    /* Panel ajustes */
+    .settings-popup {
+      position:fixed; top:70px; right:20px; width:220px; background:rgba(0,0,0,0.95); border:1px solid #0ff;
+      border-radius:12px; padding:15px; display:none; z-index:6;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <!-- Pantalla de carga -->
+  <div id="loadingScreen">
+    <div id="loadingText">Loading...</div>
+    <div class="loadingBar"><div class="loadingFill"></div></div>
+  </div>
+
+  <div class="dashboard" id="dashboard">
+    <h1 id="dashboardTitle">Welcome to your Roblox Dashboard</h1>
+    <div id="gamesContainer"></div>
+  </div>
+
+  <!-- Botones menú -->
+  <div class="menu-buttons">
+    <button id="btnIA" onclick="openIA()">AI</button>
+    <button id="btnMore" onclick="togglePanel()">More</button>
+    <button id="btnAddGame" onclick="addGamePrompt()">Add Game</button>
+    <button onclick="openWeb()">The 6 Web</button>
+  </div>
+
+  <!-- Panel Más -->
+  <div class="panel" id="panel">
+    <h2 id="panelTitle">Are you a Roblox Developer?</h2>
+    <p id="panelDesc">Click the button below to talk or ask Iker Belancor for help!</p>
+    <button id="btnJoin" onclick="openDiscord()">JOIN!</button>
+  </div>
+
+  <!-- Noticias -->
+  <div class="news-bell" onclick="toggleNews()">🔔</div>
+  <div class="settings-gear" onclick="toggleSettings()">⚙️</div>
+  <div class="news-popup" id="newsPopup">
+    <div id="newsList"></div>
+  </div>
+
+  <!-- Panel notas -->
+  <div id="notesPanel">
+    <h3 id="noteTitle"></h3>
+    <div id="notesList"></div>
+    <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+    <button id="btnSaveNote" onclick="saveNote()">Save Note</button>
+  </div>
+
+  <!-- Panel ajustes -->
+  <div class="settings-popup" id="settingsPopup">
+    <label for="langSelect">🌐 Language:</label>
+    <select id="langSelect" onchange="changeLanguage(this.value)">
+      <option value="en" selected>English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+    </select>
+  </div>
+
+  <script>
+    // === Traducciones ===
+    const translations = {
+      en: {
+        loading: "Loading...",
+        dashboard: "Welcome to your Roblox Dashboard",
+        ia: "AI", more: "More", add: "Add Game", join: "JOIN!", saveNote: "Save Note",
+        panelTitle: "Are you a Roblox Developer?",
+        panelDesc: "Click the button below to talk or ask Iker Belancor for help!",
+        notePh: "Write your note here...",
+        daysAgo: d => `${d} days ago`,
+        news: [
+          { title:"New Web Update!", text:"Version 1.2, New UI, new dashboard!", date:"2025-09-23" },
+          { title:"Special event", text:"Upcoming Halloween event in development.", date:"2025-09-20" }
+        ]
+      },
+      es: {
+        loading: "Cargando...",
+        dashboard: "Bienvenido a tu Dashboard Roblox",
+        ia: "IA", more: "Más", add: "Añadir Juego", join: "¡ÚNETE!", saveNote: "Guardar Nota",
+        panelTitle: "¿Eres un Roblox Developer?",
+        panelDesc: "¡Dale al siguiente botón para hablar o pedir ayuda a Iker Belancor!",
+        notePh: "Escribe tu nota aquí...",
+        daysAgo: d => `Hace ${d} días`,
+        news: [
+          { title:"Nueva Update de la Web", text:"Se ha lanzado la versión 1.2 con nueva UI!", date:"2025-09-23" },
+          { title:"Evento especial", text:"Próximo evento de Halloween en desarrollo.", date:"2025-09-20" }
+        ]
+      },
+      fr: {
+        loading: "Chargement...",
+        dashboard: "Bienvenue sur ton Dashboard Roblox",
+        ia: "IA", more: "Plus", add: "Ajouter Jeu", join: "REJOINS!", saveNote: "Enregistrer",
+        panelTitle: "Es-tu un développeur Roblox ?",
+        panelDesc: "Clique sur le bouton ci-dessous pour parler ou demander de l’aide à Iker Belancor !",
+        notePh: "Écris ta note ici...",
+        daysAgo: d => `Il y a ${d} jours`,
+        news: [
+          { title:"Nouvelle version d’INHABIT", text:"La version 1.2 est sortie avec de nouvelles cartes.", date:"2025-09-15" },
+          { title:"Événement spécial", text:"Événement d’Halloween en préparation.", date:"2025-09-20" }
+        ]
+      }
+    };
+
+    let currentLang = "en";
+
+    function changeLanguage(lang){
+      currentLang = lang;
+      const t = translations[lang];
+      document.getElementById("loadingText").innerText = t.loading;
+      document.getElementById("dashboardTitle").innerText = t.dashboard;
+      document.getElementById("btnIA").innerText = t.ia;
+      document.getElementById("btnMore").innerText = t.more;
+      document.getElementById("btnAddGame").innerText = t.add;
+      document.getElementById("btnJoin").innerText = t.join;
+      document.getElementById("panelTitle").innerText = t.panelTitle;
+      document.getElementById("panelDesc").innerText = t.panelDesc;
+      document.getElementById("btnSaveNote").innerText = t.saveNote;
+      document.getElementById("noteInput").placeholder = t.notePh;
+      renderNews();
+    }
+
+    // === Pantalla de carga ===
+    setTimeout(()=>{document.getElementById("loadingScreen").style.display="none"; loadGames();},3000);
+
+    // Partículas
+    const canvas=document.getElementById("particles"),ctx=canvas.getContext("2d");
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    const particles=[];
+    for(let i=0;i<60;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5});}
+    function drawParticles(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="#0ff";
+      particles.forEach(p=>{
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+        p.x+=p.dx; p.y+=p.dy;
+        if(p.x<0||p.x>canvas.width)p.dx*=-1;
+        if(p.y<0||p.y>canvas.height)p.dy*=-1;
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    // Noticias
+    function daysAgo(date){return Math.floor((new Date()-new Date(date))/(1000*60*60*24));}
+    function toggleNews(){
+      const popup=document.getElementById("newsPopup");
+      popup.style.display=(popup.style.display==="block")?"none":"block";
+      if(popup.style.display==="block") renderNews();
+    }
+    function renderNews(){
+      const t = translations[currentLang];
+      const container=document.getElementById("newsList"); container.innerHTML="";
+      t.news.forEach(n=>{
+        const item=document.createElement("div"); item.className="news-item";
+        const days=daysAgo(n.date);
+        item.innerHTML=`<strong>${n.title}</strong> <span class="bubble">${t.daysAgo(days)}</span><br><small>${n.text}</small>`;
+        container.appendChild(item);
+      });
+    }
+
+    // Panel Ajustes
+    function toggleSettings(){
+      const s=document.getElementById("settingsPopup");
+      s.style.display=(s.style.display==="block")?"none":"block";
+    }
+
+    // Panel Más
+    function togglePanel(){document.getElementById("panel").classList.toggle("open");}
+    function openIA(){window.open("https://www.roblox.com/es/games/11987675791/Chat-with-AI","_blank");}
+    function openDiscord(){window.open("https://discord.com/users/1166067053057282178","_blank");}
+    function openWeb(){window.open("https://the6web.netlify.com","_blank");}
+
+    // Gestión juegos y notas
+    let currentGame=null;
+    function loadGames(){
+      const container=document.getElementById("gamesContainer");
+      container.innerHTML="";
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.forEach((g,i)=>{
+        const card=document.createElement("div"); card.className="game-card";
+        card.innerHTML=`<img src="${g.thumb||'https://via.placeholder.com/200x100'}"><p>${g.name}</p><button onclick="removeGame(${i})">Eliminar</button>`;
+        card.onclick=()=>openNotes(g.name);
+        container.appendChild(card);
+      });
+    }
+    function addGamePrompt(){
+      const name=prompt("Game name / Nombre del juego / Nom du jeu (required)");
+      if(!name)return;
+      const thumb=prompt("Thumbnail URL (optional)");
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.push({name,thumb,notes:[]});
+      localStorage.setItem("games",JSON.stringify(games));
+      loadGames();
+    }
+    function removeGame(index){
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.splice(index,1);
+      localStorage.setItem("games",JSON.stringify(games));
+      loadGames();
+    }
+    function openNotes(name){
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      currentGame=games.find(g=>g.name===name);
+      document.getElementById("noteTitle").innerText=currentGame.name;
+      renderNotes();
+      document.getElementById("notesPanel").style.display="block";
+    }
+    function renderNotes(){
+      const container=document.getElementById("notesList"); container.innerHTML="";
+      currentGame.notes.forEach(n=>{
+        const div=document.createElement("div"); div.className="note-item"; div.innerText=`[${n.date}] ${n.text}`;
+        container.appendChild(div);
+      });
+    }
+    function saveNote(){
+      const text=document.getElementById("noteInput").value.trim();
+      if(!text)return alert("Escribe algo / Write something / Écris quelque chose!");
+      const date=new Date().toLocaleDateString();
+      currentGame.notes.push({text,date});
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      const idx=games.findIndex(g=>g.name===currentGame.name);
+      games[idx]=currentGame;
+      localStorage.setItem("games",JSON.stringify(games));
+      document.getElementById("noteInput").value="";
+      renderNotes();
+    }
+
+    // Set idioma inicial
+    changeLanguage("en");
+  </script>
+</body>
+</html>    /* Noticias */
     .news-bell { position:fixed; top:20px; right:70px; font-size:28px; cursor:pointer; z-index:5; }
     .settings-btn { position:fixed; top:20px; right:20px; width:32px; height:32px; cursor:pointer; z-index:5;}
     .news-popup { position:fixed; top:70px; right:20px; width:300px; background:rgba(0,0,0,0.95); border:1px solid #0ff; border-radius:12px; padding:15px; display:none; z-index:6;}
