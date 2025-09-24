@@ -3,301 +3,305 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RbxPanel</title>
+  <title>Iker's Web</title>
   <style>
     body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
+      margin: 0; padding: 0; height: 100%;
       font-family: Arial, sans-serif;
-      background: black;
-      color: white;
+      background: black; color: white; overflow: hidden;
     }
+    #particles { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:black; }
 
     /* Pantalla de carga */
     #loadingScreen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(135deg, #0ff, #0066ff, #ff00ff);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 1000;
-      animation: gradientAnim 6s infinite alternate;
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      display:flex; justify-content:center; align-items:center; flex-direction:column;
+      background: radial-gradient(circle, #0ff 0%, #000 100%);
+      color:white; font-size:24px; z-index:10;
     }
+    .loadingBar { width:300px; height:25px; background:#333; border-radius:20px; overflow:hidden; margin-top:20px; }
+    .loadingFill { height:100%; width:0%; background:linear-gradient(90deg,#00f0ff,#00ff80,#ff00ff); animation: loadAnim 3s linear forwards; }
+    @keyframes loadAnim { from{width:0%} to{width:100%} }
 
-    #loadingScreen h1 {
-      color: white;
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
-    @keyframes gradientAnim {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
-    }
-
-    #loadingBar {
-      width: 300px;
-      height: 20px;
-      border: 2px solid white;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    #loadingProgress {
-      width: 0%;
-      height: 100%;
-      background: white;
-      transition: width 0.3s;
-    }
-
-    #particles {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-      background: black;
-    }
-
-    .dashboard {
-      position: relative;
-      padding: 20px;
-      text-align: center;
-      z-index: 1;
-    }
-
+    .dashboard { position: relative; padding: 20px; text-align: center; z-index:1; }
     .game-card {
-      display: inline-block;
-      margin: 10px;
-      width: 200px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.05);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      transition: transform 0.3s ease;
-      cursor: pointer;
+      display:inline-block; margin:10px; width:200px; border-radius:12px; overflow:hidden;
+      background: rgba(255,255,255,0.05); box-shadow:0 4px 10px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease; cursor:pointer;
     }
-
-    .game-card:hover {
-      transform: scale(1.05);
-    }
-
-    .game-card img {
-      width: 100%;
-      display: block;
-    }
+    .game-card:hover { transform: scale(1.05); }
+    .game-card img { width:100%; display:block; }
+    .game-card button { margin:5px; padding:5px 8px; border:none; border-radius:6px; background:red; color:white; cursor:pointer; }
 
     /* Botones flotantes */
     .menu-buttons {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 5;
+      position: fixed; bottom:20px; right:20px;
+      display:flex; flex-direction:column; gap:10px; z-index:5;
     }
-
     .menu-buttons button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      background: #0ff;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
+      padding:10px 15px; border:none; border-radius:8px;
+      background:#0ff; color:black; font-weight:bold; cursor:pointer;
       transition: transform 0.2s;
     }
+    .menu-buttons button:hover { transform: scale(1.1); }
 
-    .menu-buttons button:hover {
-      transform: scale(1.1);
+    /* Panel Más */
+    .panel {
+      position: fixed; bottom:-100%; left:0; width:100%;
+      background: rgba(0,0,0,0.9); color:white; text-align:center; padding:20px; border-radius:20px 20px 0 0;
+      transition: bottom 0.5s ease; z-index:4;
     }
+    .panel.open { bottom:0; }
 
     /* Noticias */
-    .news-bell, .settings-gear {
-      position: fixed;
-      top: 20px;
-      font-size: 28px;
-      cursor: pointer;
-      z-index: 5;
+    .news-bell { position:fixed; top:20px; right:60px; font-size:28px; cursor:pointer; z-index:5; }
+    .news-popup {
+      position:fixed; top:70px; right:20px; width:300px; background:rgba(0,0,0,0.95); border:1px solid #0ff;
+      border-radius:12px; padding:15px; display:none; z-index:6;
     }
+    .news-item { margin-bottom:12px; border-bottom:1px solid #0ff; padding-bottom:8px; }
+    .news-item:last-child { border-bottom:none; }
+    .bubble { display:inline-block; background:#0ff; color:black; padding:2px 6px; border-radius:12px; font-size:12px; margin-left:6px; }
 
-    .news-bell { right: 60px; }
-    .settings-gear { right: 20px; }
-
-    .news-popup, .settings-popup {
-      position: fixed;
-      top: 70px;
-      right: 20px;
-      width: 300px;
-      background: rgba(0,0,0,0.95);
-      border: 1px solid #0ff;
-      border-radius: 12px;
-      padding: 15px;
-      display: none;
-      z-index: 6;
+    /* Panel notas */
+    #notesPanel {
+      position: fixed; right:20px; top:150px; width:300px; max-height:70%; overflow-y:auto;
+      background: rgba(0,0,0,0.95); border:1px solid #0ff; border-radius:12px; padding:10px; display:none; z-index:6;
     }
+    #notesPanel h3 { margin-top:0; }
+    #notesPanel textarea { width:100%; height:60px; margin-top:5px; border-radius:8px; padding:5px; }
+    #notesPanel button { margin-top:5px; padding:5px 10px; background:#0ff; border:none; border-radius:6px; color:black; font-weight:bold; cursor:pointer; }
+    .note-item { background:rgba(0,255,255,0.1); margin:5px 0; padding:5px; border-radius:6px; font-size:14px; }
 
-    .news-item {
-      margin-bottom: 12px;
-      border-bottom: 1px solid #0ff;
-      padding-bottom: 8px;
+    /* Ajustes */
+    .settings-gear { position:fixed; top:20px; right:20px; font-size:26px; cursor:pointer; z-index:5; }
+    .settings-popup {
+      display:none; position:fixed; top:70px; right:70px;
+      background:rgba(0,0,0,0.95); border:1px solid #0ff; padding:15px;
+      border-radius:12px; z-index:6;
     }
-
-    .news-item:last-child { border-bottom: none; }
-
-    .bubble {
-      display: inline-block;
-      background: #0ff;
-      color: black;
-      padding: 2px 6px;
-      border-radius: 12px;
-      font-size: 12px;
-      margin-left: 6px;
-    }
+    .settings-popup select, .settings-popup button { margin-top:10px; padding:5px; border-radius:6px; border:none; }
   </style>
 </head>
 <body>
-  <!-- Pantalla de carga -->
-  <div id="loadingScreen">
-    <h1>Loading your Dashboard...</h1>
-    <div id="loadingBar"><div id="loadingProgress"></div></div>
-  </div>
-
   <canvas id="particles"></canvas>
 
-  <div class="dashboard">
+  <!-- Pantalla de carga -->
+  <div id="loadingScreen">
+    <div id="loadingText">Loading...</div>
+    <div class="loadingBar"><div class="loadingFill"></div></div>
+  </div>
+
+  <div class="dashboard" id="dashboard">
     <h1 id="title">Welcome to your Roblox Dashboard</h1>
-    <div id="gameContainer"></div>
+    <div id="gamesContainer"></div>
   </div>
 
   <!-- Botones menú -->
   <div class="menu-buttons">
-    <button onclick="openIA()">IA</button>
-    <button onclick="openDiscord()">DM Discord</button>
+    <button onclick="openIA()">AI</button>
+    <button onclick="togglePanel()">More</button>
+    <button onclick="addGamePrompt()">Add Game</button>
     <button onclick="openWeb()">The 6 Web</button>
-    <button onclick="openSanLorenzo()">Ceip San Lorenzo</button>
-    <button onclick="addGame()">+ Add Game</button>
+    <button onclick="openCole()">Cole</button>
+  </div>
+
+  <!-- Panel Más -->
+  <div class="panel" id="panel">
+    <h2>Are you a Roblox Developer?</h2>
+    <p>Click the button below to talk or ask Iker Belancor for help!</p>
+    <button onclick="openDiscord()">JOIN!</button>
   </div>
 
   <!-- Noticias -->
   <div class="news-bell" onclick="toggleNews()">🔔</div>
-  <div class="settings-gear" onclick="toggleSettings()">⚙️</div>
-
   <div class="news-popup" id="newsPopup">
     <div id="newsList"></div>
   </div>
 
   <!-- Ajustes -->
+  <div class="settings-gear" onclick="toggleSettings()">⚙️</div>
   <div class="settings-popup" id="settingsPopup">
-    <label for="langSelect">🌐 Language / Idioma:</label>
-    <select id="langSelect" onchange="changeLanguage(this.value)">
-      <option value="en" selected>English</option>
+    <label for="langSelect">Idioma / Language / Langue:</label>
+    <select id="langSelect">
+      <option value="en">English</option>
       <option value="es">Español</option>
       <option value="fr">Français</option>
     </select>
+    <button onclick="saveLanguage()">Guardar / Save / Sauvegarder</button>
+  </div>
+
+  <!-- Panel notas -->
+  <div id="notesPanel">
+    <h3 id="noteTitle"></h3>
+    <div id="notesList"></div>
+    <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+    <button onclick="saveNote()">Save Note</button>
   </div>
 
   <script>
-    /* ---------- Pantalla de carga ---------- */
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      document.getElementById("loadingProgress").style.width = progress + "%";
-      if (progress >= 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          document.getElementById("loadingScreen").style.display = "none";
-        }, 500);
-      }
-    }, 300);
+    // Simula carga
+    setTimeout(()=>{document.getElementById("loadingScreen").style.display="none"; loadGames();},3000);
 
-    /* ---------- Noticias traducidas ---------- */
-    const news = {
-      en: [
-        { title: "New version of INHABIT", text: "Version 1.2 released with new maps.", date: "2025-09-15" },
-        { title: "Special event", text: "Halloween event is being developed.", date: "2025-09-20" }
-      ],
-      es: [
-        { title: "Nueva versión de INHABIT", text: "Se ha lanzado la versión 1.2 con nuevos mapas.", date: "2025-09-15" },
-        { title: "Evento especial", text: "Se está desarrollando el evento de Halloween.", date: "2025-09-20" }
-      ],
-      fr: [
-        { title: "Nouvelle version de INHABIT", text: "La version 1.2 est sortie avec de nouvelles cartes.", date: "2025-09-15" },
-        { title: "Événement spécial", text: "Un événement d'Halloween est en préparation.", date: "2025-09-20" }
-      ]
-    };
-
-    let currentLang = "en";
-
-    function daysAgo(date, lang) {
-      const diff = Math.floor((new Date() - new Date(date)) / (1000*60*60*24));
-      if (lang === "es") return `Hace ${diff} días`;
-      if (lang === "fr") return `Il y a ${diff} jours`;
-      return `${diff} days ago`;
-    }
-
-    function toggleNews() {
-      const popup = document.getElementById("newsPopup");
-      popup.style.display = (popup.style.display === "block") ? "none" : "block";
-      if (popup.style.display === "block") renderNews();
-    }
-
-    function renderNews() {
-      const container = document.getElementById("newsList");
-      container.innerHTML = "";
-      news[currentLang].forEach(n => {
-        const item = document.createElement("div");
-        item.className = "news-item";
-        item.innerHTML = `<strong>${n.title}</strong> <span class="bubble">${daysAgo(n.date, currentLang)}</span><br><small>${n.text}</small>`;
-        container.appendChild(item);
-      });
-    }
-
-    /* ---------- Ajustes (idioma) ---------- */
-    function toggleSettings() {
-      const popup = document.getElementById("settingsPopup");
-      popup.style.display = (popup.style.display === "block") ? "none" : "block";
-    }
-
-    function changeLanguage(lang) {
-      currentLang = lang;
-      renderNews();
-      if (lang === "es") document.getElementById("title").innerText = "Bienvenido a tu Dashboard Roblox";
-      else if (lang === "fr") document.getElementById("title").innerText = "Bienvenue sur votre Tableau de bord Roblox";
-      else document.getElementById("title").innerText = "Welcome to your Roblox Dashboard";
-    }
-
-    /* ---------- Webs externas ---------- */
-    function openIA() { window.open("https://www.roblox.com/es/games/11987675791/Chat-with-AI", "_blank"); }
-    function openDiscord() { window.open("https://discord.com/users/1166067053057282178", "_blank"); }
-    function openWeb() { window.open("https://the6web.netlify.com", "_blank"); }
-    function openSanLorenzo() { window.open("https://ceipsanlorenzo.com", "_blank"); }
-
-    /* ---------- Partículas ---------- */
-    const canvas = document.getElementById("particles");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    const particles = [];
-    for (let i = 0; i < 60; i++) {
-      particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*3+1, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5 });
-    }
-    function drawParticles() {
+    // Partículas
+    const canvas=document.getElementById("particles"),ctx=canvas.getContext("2d");
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    const particles=[];
+    for(let i=0;i<60;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5});}
+    function drawParticles(){
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = "#0ff";
-      particles.forEach(p => {
+      ctx.fillStyle="#0ff";
+      particles.forEach(p=>{
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-        p.x += p.dx; p.y += p.dy;
-        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        p.x+=p.dx; p.y+=p.dy;
+        if(p.x<0||p.x>canvas.width)p.dx*=-1;
+        if(p.y<0||p.y>canvas.height)p.dy*=-1;
       });
       requestAnimationFrame(drawParticles);
     }
     drawParticles();
+
+    // Noticias (multi-idioma)
+    const news_en=[{title:"New version of INHABIT",text:"Version 1.2 has been released with new maps.",date:"2025-09-15"},{title:"Special event",text:"Upcoming Halloween event in development.",date:"2025-09-20"}];
+    const news_es=[{title:"Nueva versión de INHABIT",text:"Se ha lanzado la versión 1.2 con nuevos mapas.",date:"2025-09-15"},{title:"Evento especial",text:"Próximo evento de Halloween en desarrollo.",date:"2025-09-20"}];
+    const news_fr=[{title:"Nouvelle version d'INHABIT",text:"La version 1.2 est sortie avec de nouvelles cartes.",date:"2025-09-15"},{title:"Événement spécial",text:"Événement d'Halloween en préparation.",date:"2025-09-20"}];
+
+    function daysAgo(date,lang){
+      const days=Math.floor((new Date()-new Date(date))/(1000*60*60*24));
+      if(lang==="es") return `Hace ${days} días`;
+      if(lang==="fr") return `Il y a ${days} jours`;
+      return `${days} days ago`;
+    }
+    function toggleNews(){
+      const popup=document.getElementById("newsPopup");
+      popup.style.display=(popup.style.display==="block")?"none":"block";
+      if(popup.style.display==="block") renderNews();
+    }
+    function renderNews(){
+      const container=document.getElementById("newsList"); container.innerHTML="";
+      const lang=currentLang;
+      const list=(lang==="es")?news_es:(lang==="fr")?news_fr:news_en;
+      list.forEach(n=>{
+        const item=document.createElement("div"); item.className="news-item";
+        const days=daysAgo(n.date,lang);
+        item.innerHTML=`<strong>${n.title}</strong> <span class="bubble">${days}</span><br><small>${n.text}</small>`;
+        container.appendChild(item);
+      });
+    }
+
+    // Panel Más
+    function togglePanel(){document.getElementById("panel").classList.toggle("open");}
+    function openIA(){window.open("https://www.roblox.com/es/games/11987675791/Chat-with-AI","_blank");}
+    function openDiscord(){window.open("https://discord.com/users/1166067053057282178","_blank");}
+    function openWeb(){window.open("https://the6web.netlify.com","_blank");}
+    function openCole(){window.open("https://ceipsanlorenzo.com","_blank");}
+
+    // Gestión juegos y notas
+    let currentGame=null;
+    function loadGames(){
+      const container=document.getElementById("gamesContainer");
+      container.innerHTML="";
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.forEach((g,i)=>{
+        const card=document.createElement("div"); card.className="game-card";
+        card.innerHTML=`<img src="${g.thumb||'https://via.placeholder.com/200x100'}"><p>${g.name}</p><button onclick="removeGame(${i})">X</button>`;
+        card.onclick=()=>openNotes(g.name);
+        container.appendChild(card);
+      });
+    }
+    function addGamePrompt(){
+      const name=prompt("Game name (required)");
+      if(!name)return;
+      const thumb=prompt("Thumbnail URL (optional)");
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.push({name,thumb,notes:[]});
+      localStorage.setItem("games",JSON.stringify(games));
+      loadGames();
+    }
+    function removeGame(index){
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      games.splice(index,1);
+      localStorage.setItem("games",JSON.stringify(games));
+      loadGames();
+    }
+    function openNotes(name){
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      currentGame=games.find(g=>g.name===name);
+      document.getElementById("noteTitle").innerText=currentGame.name;
+      renderNotes();
+      document.getElementById("notesPanel").style.display="block";
+    }
+    function renderNotes(){
+      const container=document.getElementById("notesList"); container.innerHTML="";
+      currentGame.notes.forEach(n=>{
+        const div=document.createElement("div"); div.className="note-item"; div.innerText=`[${n.date}] ${n.text}`;
+        container.appendChild(div);
+      });
+    }
+    function saveNote(){
+      const text=document.getElementById("noteInput").value.trim();
+      if(!text)return alert("Empty note!");
+      const date=new Date().toLocaleDateString();
+      currentGame.notes.push({text,date});
+      const games=JSON.parse(localStorage.getItem("games")||"[]");
+      const idx=games.findIndex(g=>g.name===currentGame.name);
+      games[idx]=currentGame;
+      localStorage.setItem("games",JSON.stringify(games));
+      document.getElementById("noteInput").value="";
+      renderNotes();
+    }
+
+    // Ajustes idioma
+    let currentLang = localStorage.getItem("lang") || "en";
+    document.getElementById("langSelect").value = currentLang;
+
+    function toggleSettings(){
+      const popup=document.getElementById("settingsPopup");
+      popup.style.display=(popup.style.display==="block")?"none":"block";
+    }
+    function saveLanguage(){
+      const lang=document.getElementById("langSelect").value;
+      localStorage.setItem("lang",lang);
+      changeLanguage(lang);
+      alert((lang==="es")?"Idioma guardado":(lang==="fr")?"Langue enregistrée":"Language saved");
+    }
+    function changeLanguage(lang){
+      currentLang=lang;
+      renderNews();
+      if(lang==="es"){
+        document.getElementById("title").innerText="Bienvenido a tu Dashboard Roblox";
+        document.getElementById("loadingText").innerText="Cargando...";
+        document.querySelector("#noteInput").placeholder="Escribe tu nota aquí...";
+        document.querySelector("#notesPanel button").innerText="Guardar Nota";
+        document.querySelector("#panel h2").innerText="¿Eres un Roblox Developer?";
+        document.querySelector("#panel p").innerText="¡Dale al siguiente botón para hablar o pedir ayuda a Iker Belancor!";
+        document.querySelector("#panel button").innerText="¡ÚNETE!";
+        const btns=document.querySelectorAll(".menu-buttons button");
+        btns[0].innerText="IA"; btns[1].innerText="Más"; btns[2].innerText="Añadir Juego"; btns[3].innerText="The 6 Web"; btns[4].innerText="Cole";
+      } else if(lang==="fr"){
+        document.getElementById("title").innerText="Bienvenue sur votre Tableau de bord Roblox";
+        document.getElementById("loadingText").innerText="Chargement...";
+        document.querySelector("#noteInput").placeholder="Écris ta note ici...";
+        document.querySelector("#notesPanel button").innerText="Enregistrer";
+        document.querySelector("#panel h2").innerText="Êtes-vous un développeur Roblox ?";
+        document.querySelector("#panel p").innerText="Cliquez sur le bouton ci-dessous pour parler ou demander de l'aide à Iker Belancor !";
+        document.querySelector("#panel button").innerText="REJOINDRE !";
+        const btns=document.querySelectorAll(".menu-buttons button");
+        btns[0].innerText="IA"; btns[1].innerText="Plus"; btns[2].innerText="Ajouter un jeu"; btns[3].innerText="The 6 Web"; btns[4].innerText="Cole";
+      } else {
+        document.getElementById("title").innerText="Welcome to your Roblox Dashboard";
+        document.getElementById("loadingText").innerText="Loading...";
+        document.querySelector("#noteInput").placeholder="Write your note here...";
+        document.querySelector("#notesPanel button").innerText="Save Note";
+        document.querySelector("#panel h2").innerText="Are you a Roblox Developer?";
+        document.querySelector("#panel p").innerText="Click the button below to talk or ask Iker Belancor for help!";
+        document.querySelector("#panel button").innerText="JOIN!";
+        const btns=document.querySelectorAll(".menu-buttons button");
+        btns[0].innerText="AI"; btns[1].innerText="More"; btns[2].innerText="Add Game"; btns[3].innerText="The 6 Web"; btns[4].innerText="Cole";
+      }
+    }
+
+    window.onload=()=>{ changeLanguage(currentLang); };
   </script>
 </body>
 </html>
